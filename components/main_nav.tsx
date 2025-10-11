@@ -24,6 +24,7 @@ export function MainNav({
             label:'Billboards',
             active: pathname === `/${params.storeId}/billboards`,
         },
+        
         {
             href: `/${params.storeId}/settings`,
             label:'Settings',
