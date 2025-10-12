@@ -1,5 +1,9 @@
+// app/api/upload/auth/route.ts
 import { NextResponse } from "next/server";
 import ImageKit from "imagekit";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const ik = new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
