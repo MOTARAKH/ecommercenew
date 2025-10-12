@@ -19,7 +19,7 @@ import { Billboard,Category } from "@prisma/client";
 import { SelectItem } from "@radix-ui/react-select";
 interface CategoryFormProps {
   initialData: Category | null;
-  billboards: Billboard[] ;
+  categories: Billboard[] ;
 }
 
 const formSchema = z.object({
@@ -29,7 +29,7 @@ const formSchema = z.object({
 
 type CategoryFormValues = z.infer<typeof formSchema>;
 
-export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboards }) => {
+export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, categories }) => {
   const router = useRouter();
   const { storeId, billboardId } = useParams<{ storeId: string; billboardId?: string }>();
 
@@ -50,13 +50,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
   try {
     setLoading(true);
     if (initialData && billboardId) {
-      await axios.patch(`/api/${storeId}/billboards/${billboardId}`, data);
+      await axios.patch(`/api/${storeId}/categories/${categoryId}`, data);
     } else {
-      await axios.post(`/api/${storeId}/billboards`, data);
+      await axios.post(`/api/${storeId}/categories`, data);
     }
     toast.success(toastMessage);
     router.refresh();
-    router.push(`/${storeId}/billboards`);
+    router.push(`/${storeId}/categories`);
   } catch (error: any) {
     toast.error(error?.response?.data ?? "Something went wrong");
   } finally {
@@ -67,12 +67,12 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
 const onDelete = async () => {
   try {
     setLoading(true);
-    await axios.delete(`/api/${storeId}/billboards/${billboardId}`);
-    toast.success("Billboard deleted.");
+    await axios.delete(`/api/${storeId}/categories/${categoryId}`);
+    toast.success("Category deleted.");
     router.refresh();
-    router.push(`/${storeId}/billboards`);
+    router.push(`/${storeId}/categories`);
   } catch (error: any) {
-    toast.error(error?.response?.data ?? "Make sure you removed all categories using this billboard first.");
+    toast.error(error?.response?.data ?? "Make sure you removed all products using this billboard first.");
   } finally {
     setLoading(false);
     setOpen(false);
@@ -127,7 +127,7 @@ const onDelete = async () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                      {billboards.map((billboard)=>(
+                      {categories.map((billboard)=>(
                         <SelectItem 
                         key={billboard.id}
                         value={billboard.id}
