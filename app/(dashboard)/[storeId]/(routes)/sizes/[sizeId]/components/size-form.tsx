@@ -14,54 +14,54 @@ import { Separator } from "@/components/ui/separator";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Form, FormLabel, FormField, FormControl, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Trash } from "lucide-react";
+import type { Size } from "@prisma/client";
 
-// استيراد أنواع Prisma كـ type فقط (حتى ما تنزل للمتصفح)
-import type { Billboard, Category } from "@prisma/client";
-
-interface CategoryFormProps {
-  initialData: Category | null;
-  billboards: Billboard[]; // لائحة البيلبوردز للاختيار
+interface SizeFormProps {
+  initialData: Size | null;
 }
 
 const formSchema = z.object({
   name: z.string().min(1, "name is required"),
-  billboardId: z.string().min(1, "billboard ID is required"),
+  value: z.string().min(1, "value is required"),
 });
 
-type CategoryFormValues = z.infer<typeof formSchema>;
+type SizeFormValues = z.infer<typeof formSchema>;
 
-export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboards }) => {
+export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const router = useRouter();
-  const { storeId, categoryId } = useParams<{ storeId: string; categoryId?: string }>();
+  // ⬅️ خُذ sizeId من الـ params بدل billboardId
+  const { storeId, sizeId } = useParams<{ storeId: string; sizeId?: string }>();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? "Edit category" : "Create category";
-  const description = initialData ? "Edit a category" : "Add a new category";
-  const toastMessage = initialData ? "Category updated." : "Category created.";
+  const title = initialData ? "Edit Size" : "Create Size";
+  const description = initialData ? "Edit a Size" : "Add a new Size";
+  const toastMessage = initialData ? "Size updated." : "Size created.";
   const action = initialData ? "Save Changes" : "Create";
 
-  const form = useForm<CategoryFormValues>({
+  const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? { name: initialData.name, billboardId: initialData.billboardId }
-      : { name: "", billboardId: "" },
+      ? { name: initialData.name, value: initialData.value }
+      : { name: "", value: "" },
   });
 
-  const onSubmit = async (data: CategoryFormValues) => {
+  const onSubmit = async (data: SizeFormValues) => {
     try {
       setLoading(true);
-      if (initialData && categoryId) {
-        await axios.patch(`/api/${storeId}/categories/${categoryId}`, data);
+      if (initialData && sizeId) {
+        // ⬅️ مسار PATCH الصحيح
+        await axios.patch(`/api/${storeId}/sizes/${sizeId}`, data);
       } else {
-        await axios.post(`/api/${storeId}/categories`, data);
+        // ⬅️ مسار POST الصحيح
+        await axios.post(`/api/${storeId}/sizes`, data);
       }
       toast.success(toastMessage);
       router.refresh();
-      router.push(`/${storeId}/categories`);
+      // ⬅️ ارجعي لصفحة اللائحة الصحيحة
+      router.push(`/${storeId}/sizes`);
     } catch (error: any) {
       toast.error(error?.response?.data ?? "Something went wrong");
     } finally {
@@ -70,16 +70,17 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
   };
 
   const onDelete = async () => {
-    if (!categoryId) return;
+    if (!sizeId) return;
     try {
       setLoading(true);
-      await axios.delete(`/api/${storeId}/categories/${categoryId}`);
-      toast.success("Category deleted.");
+      // ⬅️ مسار DELETE الصحيح
+      await axios.delete(`/api/${storeId}/sizes/${sizeId}`);
+      toast.success("Size deleted.");
       router.refresh();
-      router.push(`/${storeId}/categories`);
+      router.push(`/${storeId}/sizes`);
     } catch (error: any) {
       toast.error(
-        error?.response?.data ?? "Make sure you removed all products using this category first."
+        error?.response?.data ?? "Make sure you removed all products using this size first."
       );
     } finally {
       setLoading(false);
@@ -111,7 +112,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder="Category name" {...field} />
+                  <Input disabled={loading} placeholder="Size Name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,24 +121,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
 
           <FormField
             control={form.control}
-            name="billboardId"
+            name="value"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Billboard</FormLabel>
-                <Select disabled={loading} onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a billboard" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {billboards.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>
-                        {b.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel>Value</FormLabel>
+                <FormControl>
+                  <Input disabled={loading} placeholder="Size Value" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

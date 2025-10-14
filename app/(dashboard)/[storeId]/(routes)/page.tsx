@@ -1,20 +1,17 @@
-// app/(dashboard)/[storeId]/(routes)/page.tsx
-import prismadb from "@/lib/prismadb";
-
+import { SizeForm } from "./sizes/[sizeId]/components/size-form";
 export const runtime = "nodejs";
 
-export default async function DashboardPage({
+export default async function NewSizePage({
   params,
 }: {
-  params: Promise<{ storeId: string }>; // params صارت Promise
+  params: Promise<{ storeId: string }>;
 }) {
-  const { storeId } = await params;     // ✅ انتظر params مرّة وحدة
-
-  // إذا id مفتاح أساسي، استخدم findUnique
-  const store = await prismadb.store.findUnique({
-    where: { id: storeId },
-    select: { name: true },
-  });
-
-  return <div>Active Store: {store?.name ?? "—"}</div>;
+  await params; // بس لنلتزم بقواعد Next 15
+  return (
+    <div className="flex-col">
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <SizeForm initialData={null} />
+      </div>
+    </div>
+  );
 }

@@ -11,25 +11,25 @@ export const runtime = "nodejs";
  */
 export async function GET(
   _req: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { sizeId: string; } }
 ) {
   try {
-    if (!params.categoryId) {
-      return new NextResponse("category id is required", { status: 400 });
+    if (!params.sizeId) {
+      return new NextResponse("size  id is required", { status: 400 });
     }
 
-    const category = await prismadb.category.findFirst({
-      where: { id: params.categoryId},
-      
+    const size = await prismadb.size.findFirst({
+      where: { id: params.sizeId,},
+      select: { id: true, name: true, value: true, storeId: true },
     });
 
-    if (!category) {
+    if (!size) {
       return new NextResponse("Not found", { status: 404 });
     }
 
-    return NextResponse.json(category, { status: 200 });
+    return NextResponse.json(size, { status: 200 });
   } catch (error) {
-    console.error("[CATEGORY_GET]", error);
+    console.error("[SIZE_GET]", error);
     return new NextResponse("InternalError", { status: 500 });
   }
 }
@@ -40,15 +40,15 @@ export async function GET(
  */
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const { userId } = await auth();
     if (!userId) return new NextResponse("unauthenticated", { status: 401 });
 
-    const { name, billboardId } = await req.json();
+    const { name, value } = await req.json();
     if (!name?.trim()) return new NextResponse("name is required", { status: 400 });
-    if (!billboardId?.trim()) return new NextResponse("billboard id is required", { status: 400 });
+    if (!value?.trim()) return new NextResponse("value is required", { status: 400 });
 
     // تحقّق ملكية المتجر
     const store = await prismadb.store.findFirst({
@@ -57,18 +57,18 @@ export async function PATCH(
     });
     if (!store) return new NextResponse("Unauthorized", { status: 403 });
 
-    const category = await prismadb.category.updateMany({
-      where: { id: params.categoryId, storeId: params.storeId },
-      data: { name: name.trim(), billboardId: billboardId.trim() },
+    const size = await prismadb.size.updateMany({
+      where: { id: params.sizeId, storeId: params.storeId },
+      data: { name: name.trim(), value: value.trim() },
     });
 
-    if (category.count === 0) return new NextResponse("Not found", { status: 404 });
-    return NextResponse.json({ updated: category.count }, { status: 200 });
+    if (size.count === 0) return new NextResponse("Not found", { status: 404 });
+    return NextResponse.json({ updated: size.count }, { status: 200 });
     // بديل: رجّع الكائن المعدّل:
     // const b = await prismadb.billboard.update({ where: { id: params.billboardId }, data: {...} });
     // return NextResponse.json(b);
   } catch (error) {
-    console.error("[CATEGORY_PATCH]", error);
+    console.error("[SIZE_PATCH]", error);
     return new NextResponse("InternalError", { status: 500 });
   }
 }
@@ -79,12 +79,11 @@ export async function PATCH(
  */
 export async function DELETE(
   _req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const { userId } = await auth();
     if (!userId) return new NextResponse("unauthenticated", { status: 401 });
-    if (!params.categoryId) return new NextResponse("Category id is required", { status: 400 });
 
     // تحقّق ملكية المتجر
     const store = await prismadb.store.findFirst({
@@ -93,14 +92,14 @@ export async function DELETE(
     });
     if (!store) return new NextResponse("Unauthorized", { status: 403 });
 
-    const category = await prismadb.category.deleteMany({
-      where: { id: params.categoryId, storeId: params.storeId },
+    const size = await prismadb.size.deleteMany({
+      where: { id: params.sizeId, storeId: params.storeId },
     });
 
-    if (category.count === 0) return new NextResponse("Not found", { status: 404 });
-    return NextResponse.json({ deleted: category.count }, { status: 200 });
+    if (size.count === 0) return new NextResponse("Not found", { status: 404 });
+    return NextResponse.json({ deleted: size.count }, { status: 200 });
   } catch (error) {
-    console.error("[CATEGORY_DELETE]", error);
+    console.error("[SIZE_DELETE]", error);
     return new NextResponse("InternalError", { status: 500 });
   }
 }
