@@ -1,12 +1,11 @@
 // app/(dashboard)/[storeId]/(routes)/billboards/page.tsx
 import prismadb from "@/lib/prismadb";
 import {format} from "date-fns";
-import { SizeClient } from "./components/client";
-import { SizeColumn } from "./[sizeId]/components/columns";
-
+import { ColorsClient } from "./components/client";
+import { ColorColumn } from "./[colorId]/components/columns";
 export const runtime = "nodejs";
 
-export default async function ColorsPage({
+export default async function ColorPage({
   params,
 }: {
   params: Promise<{ storeId: string }>;
@@ -19,7 +18,7 @@ export default async function ColorsPage({
   });
 
 
-  const formattedColors: SizeColumn[]= colors.map((item)=>({
+  const formattedColors: ColorColumn[]= colors.map((item)=>({
     id: item.id,
     name:item.name,
     value:item.value,
@@ -29,7 +28,7 @@ export default async function ColorsPage({
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <SizeClient data={formattedColors} /> {/* ✅ الاسم مطابق */}
+        <ColorsClient data={formattedColors} /> {/* ✅ الاسم مطابق */}
       </div>
     </div>
   );

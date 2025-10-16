@@ -1,7 +1,7 @@
 import { SizeForm } from "./sizes/[sizeId]/components/size-form";
 export const runtime = "nodejs";
 
-export default async function NewSizePage({
+export default async function SizePage({
   params,
 }: {
   params: Promise<{ storeId: string }>;

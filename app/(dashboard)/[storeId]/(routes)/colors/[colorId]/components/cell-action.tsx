@@ -8,10 +8,10 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
-import type { SizeColumn } from "./columns";
+import type { ColorColumn } from "./columns";
 
 interface CellActionProps {
-  data: SizeColumn;
+  data: ColorColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -23,20 +23,20 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("size id copied to clipboard.");
+    toast.success("Color id copied to clipboard.");
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
       // ✅ استخدم data.id كبيلبورد آي دي + صحّح المسار
-      await axios.delete(`/api/${storeId}/sizes/${data.id}`);
-      toast.success("size deleted.");
+      await axios.delete(`/api/${storeId}/colors/${data.id}`);
+      toast.success("color deleted.");
       router.refresh();
       // اختياري: ارجع للّستة لو كنت بصفحة التفاصيل
-      router.push(`/${storeId}/sizes`);
+      router.push(`/${storeId}/colors`);
     } catch (error: any) {
-      toast.error(error?.response?.data ?? "Make sure you removed all products using this size first.");
+      toast.error(error?.response?.data ?? "Make sure you removed all products using this color first.");
     } finally {
       setLoading(false);
       setOpen(false);
@@ -60,7 +60,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <Copy className="mr-2 h-4 w-4" /> Copy ID
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => router.push(`/${storeId}/sizes/${data.id}`)}>
+          <DropdownMenuItem onClick={() => router.push(`/${storeId}/colors/${data.id}`)}>
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
 

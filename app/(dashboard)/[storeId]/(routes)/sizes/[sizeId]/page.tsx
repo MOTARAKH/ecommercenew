@@ -1,18 +1,18 @@
+// app/(dashboard)/[storeId]/(routes)/sizes/[sizeId]/page.tsx
 import prismadb from "@/lib/prismadb";
 import { SizeForm } from "./components/size-form";
 export const runtime = "nodejs";
 
-export default async function EditSizePage({
+export default async function SizePage({
   params,
 }: {
   params: Promise<{ storeId: string; sizeId: string }>;
 }) {
   const { storeId, sizeId } = await params;
 
-  // ✅ جيب الساير بالفلاتر الصح + الحقول اللي بدك ياها
+  // ✅ لا تستخدم select حتى يرجّع Size كامل (يطابق نوع الـ props)
   const size = await prismadb.size.findFirst({
     where: { id: sizeId, storeId },
-    select: { id: true, name: true, value: true, storeId: true },
   });
 
   return (
